@@ -32,6 +32,17 @@ The app is developed **web-first** from a single codebase; the same code will la
 
 ## Getting started
 
+With Docker (recommended — this is how the project is run in development):
+
+```bash
+docker compose up -d --build
+```
+
+The dev server listens on port `8081`. The source directory is bind-mounted
+into the container, so edits reload live without rebuilding the image.
+
+Or directly with Node:
+
 ```bash
 npm install
 npm run web        # start the dev server for web
