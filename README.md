@@ -1,56 +1,56 @@
-# Welcome to your Expo app 👋
+# Car Log
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A minimal app for keeping track of your cars and their maintenance history. Add your cars to a garage, log every service with the date and odometer reading, and see the full maintenance timeline of each car at a glance.
 
-## Get started
+> **Status:** early development — building in public, one feature at a time.
 
-1. Install dependencies
+## Features (planned)
 
-   ```bash
-   npm install
-   ```
+- [x] Project scaffold (Expo + TypeScript + Expo Router)
+- [ ] Light / dark theme (off-white & dark-grey palettes, warm amber accent)
+- [ ] Accounts (Supabase Auth)
+- [ ] Garage: add, edit and remove cars
+- [ ] Service log: maintenance records with date, odometer (km), category, notes and cost
+- [ ] Per-car maintenance timeline
+- [ ] Web deployment
+- [ ] Native iOS / Android builds
 
-2. Start the app
+### Someday
 
-   ```bash
-   npx expo start
-   ```
+Service reminders by km or date interval, fuel log, photo attachments, CSV export.
 
-In the output, you'll find options to open the app in a
+## Tech stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+| Concern  | Choice                                     |
+| -------- | ------------------------------------------ |
+| App      | [Expo](https://expo.dev) (React Native + React Native Web), TypeScript |
+| Routing  | [Expo Router](https://docs.expo.dev/router/introduction/) — file-based, URL-friendly on web |
+| Backend  | [Supabase](https://supabase.com) — Postgres, Auth, Row Level Security |
+| Schema   | SQL migrations via the Supabase CLI (`supabase/migrations/`) |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+The app is developed **web-first** from a single codebase; the same code will later ship as native mobile apps.
 
-## Get a fresh project
-
-When you're ready, run:
+## Getting started
 
 ```bash
-npm run reset-project
+npm install
+npm run web        # start the dev server for web
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Backend configuration (Supabase URL and anon key) goes in a local `.env` file — see `.env.example` once it exists. `.env` is never committed.
 
-### Other setup steps
+## Project structure
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```
+src/
+  app/          # screens (file-based routes)
+  components/   # reusable UI components
+  constants/    # theme tokens, config
+  hooks/        # shared hooks
+supabase/
+  migrations/   # versioned SQL schema
+```
 
-## Learn more
+## License
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[MIT](LICENSE)
