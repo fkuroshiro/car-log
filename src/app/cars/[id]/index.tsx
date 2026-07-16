@@ -1,11 +1,13 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
+import { ServiceTimeline } from '@/components/service-timeline';
 import { AppText } from '@/components/ui/app-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Screen } from '@/components/ui/screen';
 import { confirmAsync } from '@/lib/confirm';
+import { formatDate, formatKm } from '@/lib/format';
 import { useCar, useDeleteCar } from '@/lib/queries/cars';
 import { Spacing, useTheme } from '@/theme';
 
@@ -54,25 +56,32 @@ export default function CarDetailScreen() {
           </View>
 
           <Card style={styles.details}>
-            <DetailRow
-              label="Odometer"
-              value={`${car.odometer_km.toLocaleString('en-US').replace(/,/g, ' ')} km`}
-            />
+            <DetailRow label="Odometer" value={formatKm(car.odometer_km)} />
             <DetailRow
               label="Registration plate"
               value={car.registration_plate ?? '—'}
             />
             <DetailRow
               label="In garage since"
-              value={new Date(car.created_at).toLocaleDateString()}
+              value={formatDate(car.created_at)}
             />
           </Card>
 
-          <Card style={styles.timelinePlaceholder}>
-            <AppText variant="heading">Service timeline</AppText>
-            <AppText variant="muted">
-              Maintenance records arrive in the next phase.
-            </AppText>
+          <Card style={styles.timeline}>
+            <View style={styles.timelineHeader}>
+              <AppText variant="heading">Service timeline</AppText>
+              <Button
+                title="Log service"
+                variant="secondary"
+                onPress={() =>
+                  router.push({
+                    pathname: '/cars/[id]/services/new',
+                    params: { id: car.id },
+                  })
+                }
+              />
+            </View>
+            <ServiceTimeline carId={car.id} />
           </Card>
 
           <View style={styles.actions}>
@@ -127,7 +136,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing.three,
   },
-  timelinePlaceholder: { gap: Spacing.one },
+  timeline: { gap: Spacing.three },
+  timelineHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
   actions: { flexDirection: 'row', gap: Spacing.two },
   actionButton: { flex: 1 },
 });

@@ -5,6 +5,7 @@ import { AppText } from '@/components/ui/app-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Screen } from '@/components/ui/screen';
+import { formatKm } from '@/lib/format';
 import { useCars, type Car } from '@/lib/queries/cars';
 import { Spacing, useTheme } from '@/theme';
 
@@ -70,7 +71,7 @@ function CarListItem({ car }: { car: Car }) {
             {subtitle ? <AppText variant="muted">{subtitle}</AppText> : null}
           </View>
           <AppText variant="label" style={{ color: colors.accent }}>
-            {car.odometer_km.toLocaleString('en-US').replace(/,/g, ' ')} km
+            {formatKm(car.odometer_km)}
           </AppText>
         </Card>
       )}

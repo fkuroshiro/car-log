@@ -10,8 +10,8 @@ A minimal app for keeping track of your cars and their maintenance history. Add 
 - [x] Light / dark theme (off-white & dark-grey palettes, warm amber accent)
 - [ ] Accounts (Supabase Auth)
 - [x] Garage: add, edit and remove cars
-- [ ] Service log: maintenance records with date, odometer (km), category, notes and cost
-- [ ] Per-car maintenance timeline
+- [x] Service log: maintenance records with date, odometer (km), category, notes and cost
+- [x] Per-car maintenance timeline
 - [ ] Web deployment
 - [ ] Native iOS / Android builds
 
