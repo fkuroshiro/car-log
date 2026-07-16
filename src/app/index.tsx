@@ -22,7 +22,14 @@ export default function GarageScreen() {
             {cars ? `${cars.length} car${cars.length === 1 ? '' : 's'}` : ' '}
           </AppText>
         </View>
-        <Button title="Add car" onPress={() => router.push('/cars/new')} />
+        <View style={styles.headerActions}>
+          <Button
+            title="Settings"
+            variant="ghost"
+            onPress={() => router.push('/settings')}
+          />
+          <Button title="Add car" onPress={() => router.push('/cars/new')} />
+        </View>
       </View>
 
       {isPending ? (
@@ -41,6 +48,10 @@ export default function GarageScreen() {
           <AppText variant="muted">
             Add your first car to start its service log.
           </AppText>
+          <Button
+            title="Add your first car"
+            onPress={() => router.push('/cars/new')}
+          />
         </View>
       ) : (
         <FlatList
@@ -88,6 +99,11 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.three,
   },
   headerText: { gap: Spacing.one },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.one,
+  },
   center: {
     flex: 1,
     alignItems: 'center',

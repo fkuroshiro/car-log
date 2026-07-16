@@ -17,7 +17,7 @@ A minimal app for keeping track of your cars and their maintenance history. Add 
 
 ### Someday
 
-Service reminders by km or date interval, fuel log, photo attachments, CSV export.
+Service reminders by km or date interval, fuel log, photo attachments, CSV export, currency setting for costs.
 
 ## Tech stack
 
