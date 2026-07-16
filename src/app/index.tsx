@@ -1,87 +1,105 @@
-import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Screen } from '@/components/ui/screen';
-import { TextField } from '@/components/ui/text-field';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Spacing } from '@/theme';
+import { useCars, type Car } from '@/lib/queries/cars';
+import { Spacing, useTheme } from '@/theme';
 
-/**
- * Temporary style guide so every design-system piece can be seen in both
- * themes. This screen becomes the garage (car list) in a later phase.
- */
-export default function HomeScreen() {
-  const [nickname, setNickname] = useState('');
+export default function GarageScreen() {
+  const { colors } = useTheme();
+  const { data: cars, isPending, error, refetch } = useCars();
 
   return (
-    <Screen style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <AppText variant="title">Car Log</AppText>
+    <Screen>
+      <View style={styles.headerRow}>
+        <View style={styles.headerText}>
+          <AppText variant="title">Garage</AppText>
           <AppText variant="muted">
-            Design system preview — becomes the garage soon.
+            {cars ? `${cars.length} car${cars.length === 1 ? '' : 's'}` : ' '}
           </AppText>
         </View>
+        <Button title="Add car" onPress={() => router.push('/cars/new')} />
+      </View>
 
-        <ThemeToggle />
-
-        <Card style={styles.section}>
-          <AppText variant="heading">Buttons</AppText>
-          <View style={styles.row}>
-            <Button title="Add car" />
-            <Button title="Edit" variant="secondary" />
-            <Button title="Cancel" variant="ghost" />
-            <Button title="Delete" variant="danger" />
-          </View>
-          <View style={styles.row}>
-            <Button title="Saving" loading />
-            <Button title="Disabled" disabled />
-          </View>
-        </Card>
-
-        <Card style={styles.section}>
-          <AppText variant="heading">Inputs</AppText>
-          <TextField
-            label="Car nickname"
-            placeholder="e.g. Daily driver"
-            value={nickname}
-            onChangeText={setNickname}
-          />
-          <TextField
-            label="Odometer (km)"
-            placeholder="132500"
-            keyboardType="numeric"
-            error="Example of a validation error"
-          />
-        </Card>
-
-        <Card style={styles.section}>
-          <AppText variant="heading">Typography</AppText>
-          <AppText variant="title">Title</AppText>
-          <AppText variant="heading">Heading</AppText>
-          <AppText>Body — regular content text.</AppText>
-          <AppText variant="muted">Muted — secondary information.</AppText>
-          <AppText variant="small">Small — timestamps, footnotes.</AppText>
-        </Card>
-      </ScrollView>
+      {isPending ? (
+        <View style={styles.center}>
+          <ActivityIndicator color={colors.accent} />
+        </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <AppText variant="muted">Couldn&apos;t load your cars.</AppText>
+          <AppText variant="small">{error.message}</AppText>
+          <Button title="Retry" variant="secondary" onPress={() => refetch()} />
+        </View>
+      ) : cars.length === 0 ? (
+        <View style={styles.center}>
+          <AppText variant="heading">No cars yet</AppText>
+          <AppText variant="muted">
+            Add your first car to start its service log.
+          </AppText>
+        </View>
+      ) : (
+        <FlatList
+          data={cars}
+          keyExtractor={(car) => car.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => <CarListItem car={item} />}
+        />
+      )}
     </Screen>
   );
 }
 
+function CarListItem({ car }: { car: Car }) {
+  const { colors } = useTheme();
+  const subtitle = [car.make, car.model, car.year].filter(Boolean).join(' ');
+
+  return (
+    <Pressable
+      onPress={() =>
+        router.push({ pathname: '/cars/[id]', params: { id: car.id } })
+      }>
+      {({ pressed }) => (
+        <Card style={[styles.item, pressed && styles.pressed]}>
+          <View style={styles.itemText}>
+            <AppText variant="heading">{car.name}</AppText>
+            {subtitle ? <AppText variant="muted">{subtitle}</AppText> : null}
+          </View>
+          <AppText variant="label" style={{ color: colors.accent }}>
+            {car.odometer_km.toLocaleString('en-US').replace(/,/g, ' ')} km
+          </AppText>
+        </Card>
+      )}
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  screen: { padding: 0 },
-  list: { padding: Spacing.three, gap: Spacing.three },
-  header: { gap: Spacing.one },
-  section: { gap: Spacing.three },
-  row: {
+  headerRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.three,
+    marginBottom: Spacing.three,
+  },
+  headerText: { gap: Spacing.one },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.two,
   },
+  list: { gap: Spacing.two, paddingBottom: Spacing.five },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.three,
+  },
+  itemText: { gap: Spacing.half, flexShrink: 1 },
+  pressed: { opacity: 0.85 },
 });
