@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
+import { Platform } from 'react-native';
 
 import type { Database } from './database.types';
 
@@ -17,9 +18,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    // AsyncStorage works on both native and web (localStorage under the
-    // hood), so sessions survive app restarts everywhere.
-    storage: AsyncStorage,
+    // Native needs AsyncStorage for session persistence. On web, supabase's
+    // default adapter must be used instead: it guards against `window` not
+    // existing, which is the case while Expo statically pre-renders pages
+    // in Node — AsyncStorage's web shim would crash there.
+    ...(Platform.OS === 'web' ? {} : { storage: AsyncStorage }),
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
