@@ -1,4 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   createContext,
   use,
@@ -8,78 +9,75 @@ import {
 } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { AppText } from '@/components/ui/app-text';
 import { supabase } from '@/lib/supabase';
-import { Spacing, useTheme } from '@/theme';
+import { useTheme } from '@/theme';
 
-const SessionContext = createContext<Session | null>(null);
-
-/**
- * TEMPORARY until the auth phase: when nobody is signed in, sign into the
- * dev account from .env so the app can talk to the database during
- * development. Real sign-in/sign-up screens will replace this shim.
- */
-async function devSignIn() {
-  const email = process.env.EXPO_PUBLIC_DEV_EMAIL;
-  const password = process.env.EXPO_PUBLIC_DEV_PASSWORD;
-  if (!__DEV__ || !email || !password) return;
-
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    console.error('Dev sign-in failed:', error.message);
-  }
+interface SessionState {
+  session: Session | null;
+  ready: boolean;
 }
 
+const SessionContext = createContext<SessionState | null>(null);
+
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [ready, setReady] = useState(false);
+  const queryClient = useQueryClient();
+  const [state, setState] = useState<SessionState>({
+    session: null,
+    ready: false,
+  });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setReady(true);
-      if (!data.session) {
-        devSignIn();
-      }
+      setState({ session: data.session, ready: true });
     });
 
     // Fires on sign-in, sign-out and token refresh — the single place that
     // keeps React state in sync with the real auth state.
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, nextSession) => {
-        setSession(nextSession);
+      (event, session) => {
+        setState({ session, ready: true });
+        if (event === 'SIGNED_OUT') {
+          // Never let the next user see the previous user's cached data.
+          queryClient.clear();
+        }
       }
     );
     return () => subscription.subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
-  if (!session) {
-    return <ConnectingScreen failed={ready} />;
+  // Until the stored session is loaded we don't know whether to show the
+  // garage or the sign-in screen, so show neither.
+  if (!state.ready) {
+    return <SplashSpinner />;
   }
 
-  return <SessionContext value={session}>{children}</SessionContext>;
+  return <SessionContext value={state}>{children}</SessionContext>;
 }
 
-function ConnectingScreen({ failed }: { failed: boolean }) {
+function SplashSpinner() {
   const { colors } = useTheme();
 
   return (
     <View style={[styles.center, { backgroundColor: colors.background }]}>
       <ActivityIndicator color={colors.accent} />
-      {failed ? (
-        <AppText variant="muted">
-          Waiting for dev sign-in… check EXPO_PUBLIC_DEV_* in .env if this
-          never finishes.
-        </AppText>
-      ) : null}
     </View>
   );
 }
 
-export function useSession() {
-  const session = use(SessionContext);
+/** Session state including signed-out; for layouts deciding where to route. */
+export function useSessionState(): SessionState {
+  const state = use(SessionContext);
+  if (!state) {
+    throw new Error('useSessionState must be used inside <SessionProvider>');
+  }
+  return state;
+}
+
+/** The signed-in session. Only call from screens inside the (app) group. */
+export function useSession(): Session {
+  const { session } = useSessionState();
   if (!session) {
-    throw new Error('useSession must be used inside <SessionProvider>');
+    throw new Error('useSession requires a signed-in user');
   }
   return session;
 }
@@ -89,7 +87,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: Spacing.three,
-    padding: Spacing.four,
   },
 });

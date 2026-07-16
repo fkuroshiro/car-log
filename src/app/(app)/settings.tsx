@@ -1,4 +1,5 @@
 import { router, Stack } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useSession } from '@/auth/session-context';
@@ -9,12 +10,20 @@ import { Card } from '@/components/ui/card';
 import { Screen } from '@/components/ui/screen';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useProfile } from '@/lib/queries/profile';
+import { supabase } from '@/lib/supabase';
 import { Spacing, useTheme } from '@/theme';
 
 export default function SettingsScreen() {
   const { colors } = useTheme();
   const session = useSession();
   const { data: profile, isPending } = useProfile();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    // The (app) layout redirects to /sign-in as soon as the session is gone.
+    await supabase.auth.signOut();
+  };
 
   return (
     <Screen style={styles.screen}>
@@ -46,10 +55,12 @@ export default function SettingsScreen() {
             <AppText variant="muted">Signed in as</AppText>
             <AppText>{session.user.email}</AppText>
           </View>
-          <AppText variant="small">
-            This is the temporary development account — real sign-in and
-            sign-out arrive with the auth phase.
-          </AppText>
+          <Button
+            title="Sign out"
+            variant="secondary"
+            loading={signingOut}
+            onPress={handleSignOut}
+          />
         </Card>
 
         <Button
