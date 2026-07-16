@@ -10,6 +10,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 
 import { SessionProvider } from '@/auth/session-context';
+import '@/i18n';
+import { LanguageProvider } from '@/i18n/language-context';
 import { ThemeProvider, useTheme } from '@/theme';
 
 // One client for the whole app: it caches every query result, deduplicates
@@ -29,11 +31,13 @@ export default function RootLayout() {
           content="Track your cars and their maintenance history."
         />
       </Head>
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          <RootNavigator />
-        </SessionProvider>
-      </QueryClientProvider>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>
+            <RootNavigator />
+          </SessionProvider>
+        </QueryClientProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

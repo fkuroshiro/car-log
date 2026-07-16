@@ -1,5 +1,6 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -11,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { Spacing, useTheme } from '@/theme';
 
 export default function SignInScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +21,7 @@ export default function SignInScreen() {
 
   const handleSubmit = async () => {
     if (!email.trim() || !password) {
-      setError('Enter your email and password.');
+      setError(t('auth.errorMissingCredentials'));
       return;
     }
     setSubmitting(true);
@@ -42,16 +44,14 @@ export default function SignInScreen() {
       <View style={styles.wrap}>
         <View style={styles.brand}>
           <AppText variant="title">Car Log</AppText>
-          <AppText variant="muted">
-            Your cars&apos; service history, in one place.
-          </AppText>
+          <AppText variant="muted">{t('auth.tagline')}</AppText>
         </View>
 
         <Card style={styles.card}>
-          <AppText variant="heading">Sign in</AppText>
+          <AppText variant="heading">{t('auth.signInTitle')}</AppText>
           <TextField
-            label="Email"
-            placeholder="you@example.com"
+            label={t('auth.email')}
+            placeholder={t('auth.emailPlaceholder')}
             autoCapitalize="none"
             autoCorrect={false}
             autoComplete="email"
@@ -60,8 +60,8 @@ export default function SignInScreen() {
             onChangeText={setEmail}
           />
           <TextField
-            label="Password"
-            placeholder="••••••••"
+            label={t('auth.password')}
+            placeholder={t('auth.passwordPlaceholder')}
             secureTextEntry
             autoComplete="current-password"
             returnKeyType="go"
@@ -74,14 +74,18 @@ export default function SignInScreen() {
               {error}
             </AppText>
           ) : null}
-          <Button title="Sign in" loading={submitting} onPress={handleSubmit} />
+          <Button
+            title={t('auth.signInAction')}
+            loading={submitting}
+            onPress={handleSubmit}
+          />
         </Card>
 
         <View style={styles.switchRow}>
-          <AppText variant="muted">New here?</AppText>
+          <AppText variant="muted">{t('auth.noAccount')}</AppText>
           <Link href="/sign-up">
             <AppText variant="label" style={{ color: colors.accent }}>
-              Create an account
+              {t('auth.createAccountLink')}
             </AppText>
           </Link>
         </View>

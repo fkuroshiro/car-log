@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -9,6 +10,7 @@ import { Spacing, useTheme } from '@/theme';
 
 /** The maintenance history of one car, newest first. */
 export function ServiceTimeline({ carId }: { carId: string }) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { data: records, isPending, error } = useServiceRecords(carId);
 
@@ -18,16 +20,12 @@ export function ServiceTimeline({ carId }: { carId: string }) {
   if (error) {
     return (
       <AppText variant="small" style={{ color: colors.danger }}>
-        Couldn&apos;t load the timeline: {error.message}
+        {t('service.timelineError')} {error.message}
       </AppText>
     );
   }
   if (records.length === 0) {
-    return (
-      <AppText variant="muted">
-        No service records yet — log the first one.
-      </AppText>
-    );
+    return <AppText variant="muted">{t('service.empty')}</AppText>;
   }
 
   return (

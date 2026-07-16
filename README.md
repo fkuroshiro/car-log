@@ -8,6 +8,7 @@ A minimal app for keeping track of your cars and their maintenance history. Add 
 
 - [x] Project scaffold (Expo + TypeScript + Expo Router)
 - [x] Light / dark theme (off-white & dark-grey palettes, warm amber accent)
+- [x] English & Czech localization — follows the device language, manual override in settings
 - [x] Accounts (Supabase Auth)
 - [x] Garage: add, edit and remove cars
 - [x] Service log: maintenance records with date, odometer (km), category, notes and cost

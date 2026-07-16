@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -34,6 +35,7 @@ export function ServiceRecordForm({
   error,
   onSubmit,
 }: ServiceRecordFormProps) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [servicedOn, setServicedOn] = useState(
     initial?.serviced_on ?? todayISO()
@@ -58,7 +60,7 @@ export function ServiceRecordForm({
     const errors: typeof fieldErrors = {};
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(servicedOn.trim())) {
-      errors.servicedOn = 'Use the YYYY-MM-DD format, e.g. 2026-03-12.';
+      errors.servicedOn = t('service.errorDate');
     }
     const odometerNumber = Number(odometer.trim());
     if (
@@ -66,16 +68,16 @@ export function ServiceRecordForm({
       !Number.isInteger(odometerNumber) ||
       odometerNumber < 0
     ) {
-      errors.odometer = 'Enter kilometres as a whole number.';
+      errors.odometer = t('service.errorOdometer');
     }
     if (!title.trim()) {
-      errors.title = 'Describe what was done.';
+      errors.title = t('service.errorTitle');
     }
     const costNumber = cost.trim()
       ? Number(cost.trim().replace(',', '.'))
       : null;
     if (costNumber !== null && (Number.isNaN(costNumber) || costNumber < 0)) {
-      errors.cost = 'Enter the cost as a number.';
+      errors.cost = t('service.errorCost');
     }
 
     setFieldErrors(errors);
@@ -96,16 +98,16 @@ export function ServiceRecordForm({
   return (
     <View style={styles.form}>
       <View style={styles.categoryField}>
-        <AppText variant="label">Category</AppText>
+        <AppText variant="label">{t('service.category')}</AppText>
         <View style={styles.chips}>
           {SERVICE_CATEGORIES.map((option) => {
-            const selected = option.value === category;
+            const selected = option === category;
             return (
               <Pressable
-                key={option.value}
+                key={option}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
-                onPress={() => setCategory(option.value)}
+                onPress={() => setCategory(option)}
                 style={[
                   styles.chip,
                   {
@@ -120,7 +122,7 @@ export function ServiceRecordForm({
                   style={{
                     color: selected ? colors.accent : colors.textMuted,
                   }}>
-                  {option.label}
+                  {t(`categories.${option}`)}
                 </AppText>
               </Pressable>
             );
@@ -129,8 +131,8 @@ export function ServiceRecordForm({
       </View>
 
       <TextField
-        label="Title *"
-        placeholder="e.g. Oil and filter change"
+        label={t('service.title')}
+        placeholder={t('service.titlePlaceholder')}
         value={title}
         onChangeText={setTitle}
         error={fieldErrors.title}
@@ -138,14 +140,14 @@ export function ServiceRecordForm({
       <View style={styles.row}>
         <View style={styles.flex}>
           <DateField
-            label="Date *"
+            label={t('service.date')}
             value={servicedOn}
             onChangeText={setServicedOn}
             error={fieldErrors.servicedOn}
           />
         </View>
         <TextField
-          label="Odometer (km) *"
+          label={t('service.odometer')}
           placeholder="132500"
           keyboardType="numeric"
           value={odometer}
@@ -155,16 +157,16 @@ export function ServiceRecordForm({
         />
       </View>
       <TextField
-        label="Cost"
-        placeholder="Optional"
+        label={t('service.cost')}
+        placeholder={t('service.costPlaceholder')}
         keyboardType="decimal-pad"
         value={cost}
         onChangeText={setCost}
         error={fieldErrors.cost}
       />
       <TextField
-        label="Notes"
-        placeholder="Parts, workshop, anything worth remembering…"
+        label={t('service.notes')}
+        placeholder={t('service.notesPlaceholder')}
         value={notes}
         onChangeText={setNotes}
         multiline

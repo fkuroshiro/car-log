@@ -1,4 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { CarForm } from '@/components/car-form';
@@ -8,6 +9,7 @@ import { useCar, useUpdateCar } from '@/lib/queries/cars';
 import { Spacing, useTheme } from '@/theme';
 
 export default function EditCarScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const { data: car, isPending, error } = useCar(id);
@@ -15,7 +17,9 @@ export default function EditCarScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Stack.Screen options={{ headerShown: true, title: 'Edit car' }} />
+      <Stack.Screen
+        options={{ headerShown: true, title: t('car.editTitle') }}
+      />
 
       {isPending ? (
         <View style={styles.center}>
@@ -23,7 +27,7 @@ export default function EditCarScreen() {
         </View>
       ) : error || !car ? (
         <View style={styles.center}>
-          <AppText variant="muted">Couldn&apos;t load this car.</AppText>
+          <AppText variant="muted">{t('car.loadError')}</AppText>
           {error ? <AppText variant="small">{error.message}</AppText> : null}
         </View>
       ) : (
@@ -32,7 +36,7 @@ export default function EditCarScreen() {
           showsVerticalScrollIndicator={false}>
           <CarForm
             initial={car}
-            submitLabel="Save changes"
+            submitLabel={t('carForm.submitEdit')}
             submitting={updateCar.isPending}
             error={updateCar.error?.message}
             onSubmit={(input) =>

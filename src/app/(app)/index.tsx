@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -10,6 +11,7 @@ import { useCars, type Car } from '@/lib/queries/cars';
 import { Spacing, useTheme } from '@/theme';
 
 export default function GarageScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { data: cars, isPending, error, refetch } = useCars();
 
@@ -17,18 +19,21 @@ export default function GarageScreen() {
     <Screen>
       <View style={styles.headerRow}>
         <View style={styles.headerText}>
-          <AppText variant="title">Garage</AppText>
+          <AppText variant="title">{t('garage.title')}</AppText>
           <AppText variant="muted">
-            {cars ? `${cars.length} car${cars.length === 1 ? '' : 's'}` : ' '}
+            {cars ? t('garage.carCount', { count: cars.length }) : ' '}
           </AppText>
         </View>
         <View style={styles.headerActions}>
           <Button
-            title="Settings"
+            title={t('garage.settings')}
             variant="ghost"
             onPress={() => router.push('/settings')}
           />
-          <Button title="Add car" onPress={() => router.push('/cars/new')} />
+          <Button
+            title={t('garage.addCar')}
+            onPress={() => router.push('/cars/new')}
+          />
         </View>
       </View>
 
@@ -38,18 +43,20 @@ export default function GarageScreen() {
         </View>
       ) : error ? (
         <View style={styles.center}>
-          <AppText variant="muted">Couldn&apos;t load your cars.</AppText>
+          <AppText variant="muted">{t('garage.loadError')}</AppText>
           <AppText variant="small">{error.message}</AppText>
-          <Button title="Retry" variant="secondary" onPress={() => refetch()} />
+          <Button
+            title={t('common.retry')}
+            variant="secondary"
+            onPress={() => refetch()}
+          />
         </View>
       ) : cars.length === 0 ? (
         <View style={styles.center}>
-          <AppText variant="heading">No cars yet</AppText>
-          <AppText variant="muted">
-            Add your first car to start its service log.
-          </AppText>
+          <AppText variant="heading">{t('garage.empty')}</AppText>
+          <AppText variant="muted">{t('garage.emptyHint')}</AppText>
           <Button
-            title="Add your first car"
+            title={t('garage.emptyAction')}
             onPress={() => router.push('/cars/new')}
           />
         </View>

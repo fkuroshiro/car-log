@@ -1,4 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ServiceRecordForm } from '@/components/service-record-form';
@@ -9,6 +10,7 @@ import { useCreateServiceRecord } from '@/lib/queries/service-records';
 import { Spacing, useTheme } from '@/theme';
 
 export default function NewServiceRecordScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const { data: car, isPending, error } = useCar(id);
@@ -16,7 +18,9 @@ export default function NewServiceRecordScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Stack.Screen options={{ headerShown: true, title: 'Log service' }} />
+      <Stack.Screen
+        options={{ headerShown: true, title: t('service.logTitle') }}
+      />
 
       {isPending ? (
         <View style={styles.center}>
@@ -24,7 +28,7 @@ export default function NewServiceRecordScreen() {
         </View>
       ) : error || !car ? (
         <View style={styles.center}>
-          <AppText variant="muted">Couldn&apos;t load this car.</AppText>
+          <AppText variant="muted">{t('car.loadError')}</AppText>
           {error ? <AppText variant="small">{error.message}</AppText> : null}
         </View>
       ) : (
@@ -33,7 +37,7 @@ export default function NewServiceRecordScreen() {
           showsVerticalScrollIndicator={false}>
           <ServiceRecordForm
             carOdometerKm={car.odometer_km}
-            submitLabel="Log service"
+            submitLabel={t('service.submitNew')}
             submitting={createRecord.isPending}
             error={createRecord.error?.message}
             onSubmit={(input) =>

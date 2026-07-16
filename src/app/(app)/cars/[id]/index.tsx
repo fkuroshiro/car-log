@@ -1,4 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ServiceTimeline } from '@/components/service-timeline';
@@ -12,6 +13,7 @@ import { useCar, useDeleteCar } from '@/lib/queries/cars';
 import { Spacing, useTheme } from '@/theme';
 
 export default function CarDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const { data: car, isPending, error } = useCar(id);
@@ -20,8 +22,8 @@ export default function CarDetailScreen() {
   const handleDelete = async () => {
     if (!car) return;
     const confirmed = await confirmAsync(
-      'Delete car',
-      `Remove "${car.name}" and its entire service history? This cannot be undone.`
+      t('car.deleteTitle'),
+      t('car.deleteMessage', { name: car.name })
     );
     if (confirmed) {
       deleteCar.mutate(car.id, { onSuccess: () => router.replace('/') });
@@ -31,7 +33,7 @@ export default function CarDetailScreen() {
   return (
     <Screen style={styles.screen}>
       <Stack.Screen
-        options={{ headerShown: true, title: car?.name ?? 'Car' }}
+        options={{ headerShown: true, title: car?.name ?? t('car.fallbackTitle') }}
       />
 
       {isPending ? (
@@ -40,7 +42,7 @@ export default function CarDetailScreen() {
         </View>
       ) : error || !car ? (
         <View style={styles.center}>
-          <AppText variant="muted">Couldn&apos;t load this car.</AppText>
+          <AppText variant="muted">{t('car.loadError')}</AppText>
           {error ? <AppText variant="small">{error.message}</AppText> : null}
         </View>
       ) : (
@@ -51,27 +53,30 @@ export default function CarDetailScreen() {
             <AppText variant="title">{car.name}</AppText>
             <AppText variant="muted">
               {[car.make, car.model, car.year].filter(Boolean).join(' ') ||
-                'No details yet'}
+                t('car.noDetails')}
             </AppText>
           </View>
 
           <Card style={styles.details}>
-            <DetailRow label="Odometer" value={formatKm(car.odometer_km)} />
             <DetailRow
-              label="Registration plate"
+              label={t('car.odometer')}
+              value={formatKm(car.odometer_km)}
+            />
+            <DetailRow
+              label={t('car.plate')}
               value={car.registration_plate ?? '—'}
             />
             <DetailRow
-              label="In garage since"
+              label={t('car.since')}
               value={formatDate(car.created_at)}
             />
           </Card>
 
           <Card style={styles.timeline}>
             <View style={styles.timelineHeader}>
-              <AppText variant="heading">Service timeline</AppText>
+              <AppText variant="heading">{t('car.timeline')}</AppText>
               <Button
-                title="Log service"
+                title={t('car.logService')}
                 variant="secondary"
                 onPress={() =>
                   router.push({
@@ -86,7 +91,7 @@ export default function CarDetailScreen() {
 
           <View style={styles.actions}>
             <Button
-              title="Edit"
+              title={t('car.edit')}
               variant="secondary"
               style={styles.actionButton}
               onPress={() =>
@@ -97,7 +102,7 @@ export default function CarDetailScreen() {
               }
             />
             <Button
-              title="Delete"
+              title={t('car.delete')}
               variant="danger"
               style={styles.actionButton}
               loading={deleteCar.isPending}

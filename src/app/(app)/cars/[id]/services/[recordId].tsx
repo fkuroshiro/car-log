@@ -1,4 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ServiceRecordForm } from '@/components/service-record-form';
@@ -14,6 +15,7 @@ import {
 import { Spacing, useTheme } from '@/theme';
 
 export default function EditServiceRecordScreen() {
+  const { t } = useTranslation();
   const { id, recordId } = useLocalSearchParams<{
     id: string;
     recordId: string;
@@ -26,8 +28,8 @@ export default function EditServiceRecordScreen() {
   const handleDelete = async () => {
     if (!record) return;
     const confirmed = await confirmAsync(
-      'Delete service record',
-      `Remove "${record.title}" from the timeline? This cannot be undone.`
+      t('service.deleteTitle'),
+      t('service.deleteMessage', { title: record.title })
     );
     if (confirmed) {
       deleteRecord.mutate(record.id, { onSuccess: () => router.back() });
@@ -36,7 +38,9 @@ export default function EditServiceRecordScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Stack.Screen options={{ headerShown: true, title: 'Edit service' }} />
+      <Stack.Screen
+        options={{ headerShown: true, title: t('service.editTitle') }}
+      />
 
       {isPending ? (
         <View style={styles.center}>
@@ -44,7 +48,7 @@ export default function EditServiceRecordScreen() {
         </View>
       ) : error || !record ? (
         <View style={styles.center}>
-          <AppText variant="muted">Couldn&apos;t load this record.</AppText>
+          <AppText variant="muted">{t('service.loadError')}</AppText>
           {error ? <AppText variant="small">{error.message}</AppText> : null}
         </View>
       ) : (
@@ -53,7 +57,7 @@ export default function EditServiceRecordScreen() {
           showsVerticalScrollIndicator={false}>
           <ServiceRecordForm
             initial={record}
-            submitLabel="Save changes"
+            submitLabel={t('service.submitEdit')}
             submitting={updateRecord.isPending}
             error={updateRecord.error?.message}
             onSubmit={(input) =>
@@ -61,7 +65,7 @@ export default function EditServiceRecordScreen() {
             }
           />
           <Button
-            title="Delete record"
+            title={t('service.deleteAction')}
             variant="danger"
             loading={deleteRecord.isPending}
             onPress={handleDelete}

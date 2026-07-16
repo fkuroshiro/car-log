@@ -1,5 +1,6 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -11,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { Spacing, useTheme } from '@/theme';
 
 export default function SignUpScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -21,11 +23,11 @@ export default function SignUpScreen() {
 
   const handleSubmit = async () => {
     if (!email.trim() || !email.includes('@')) {
-      setError('Enter a valid email address.');
+      setError(t('auth.errorInvalidEmail'));
       return;
     }
     if (password.length < 6) {
-      setError('The password needs at least 6 characters.');
+      setError(t('auth.errorShortPassword'));
       return;
     }
     setSubmitting(true);
@@ -46,9 +48,7 @@ export default function SignUpScreen() {
     }
     if (!data.session) {
       // Email confirmation is enabled: no session until the link is clicked.
-      setNotice(
-        'Account created — check your inbox and confirm your email, then sign in.'
-      );
+      setNotice(t('auth.confirmNotice'));
       setSubmitting(false);
     }
     // With confirmation disabled a session exists already and the route
@@ -60,21 +60,21 @@ export default function SignUpScreen() {
       <View style={styles.wrap}>
         <View style={styles.brand}>
           <AppText variant="title">Car Log</AppText>
-          <AppText variant="muted">Create your garage.</AppText>
+          <AppText variant="muted">{t('auth.signUpTagline')}</AppText>
         </View>
 
         <Card style={styles.card}>
-          <AppText variant="heading">Create account</AppText>
+          <AppText variant="heading">{t('auth.signUpTitle')}</AppText>
           <TextField
-            label="Display name"
-            placeholder="Optional"
+            label={t('auth.displayName')}
+            placeholder={t('auth.displayNamePlaceholder')}
             autoComplete="name"
             value={displayName}
             onChangeText={setDisplayName}
           />
           <TextField
-            label="Email"
-            placeholder="you@example.com"
+            label={t('auth.email')}
+            placeholder={t('auth.emailPlaceholder')}
             autoCapitalize="none"
             autoCorrect={false}
             autoComplete="email"
@@ -83,8 +83,8 @@ export default function SignUpScreen() {
             onChangeText={setEmail}
           />
           <TextField
-            label="Password"
-            placeholder="At least 6 characters"
+            label={t('auth.password')}
+            placeholder={t('auth.newPasswordPlaceholder')}
             secureTextEntry
             autoComplete="new-password"
             returnKeyType="go"
@@ -103,17 +103,17 @@ export default function SignUpScreen() {
             </AppText>
           ) : null}
           <Button
-            title="Create account"
+            title={t('auth.signUpAction')}
             loading={submitting}
             onPress={handleSubmit}
           />
         </Card>
 
         <View style={styles.switchRow}>
-          <AppText variant="muted">Already have an account?</AppText>
+          <AppText variant="muted">{t('auth.haveAccount')}</AppText>
           <Link href="/sign-in">
             <AppText variant="label" style={{ color: colors.accent }}>
-              Sign in
+              {t('auth.signInLink')}
             </AppText>
           </Link>
         </View>

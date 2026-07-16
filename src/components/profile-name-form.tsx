@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -12,6 +13,7 @@ import { Spacing, useTheme } from '@/theme';
  * stored name as its initial value — no state-syncing effect needed.
  */
 export function ProfileNameForm({ initialName }: { initialName: string }) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const updateProfile = useUpdateProfile();
   const [displayName, setDisplayName] = useState(initialName);
@@ -19,21 +21,21 @@ export function ProfileNameForm({ initialName }: { initialName: string }) {
   return (
     <View style={styles.form}>
       <TextField
-        label="Display name"
-        placeholder="How should we call you?"
+        label={t('settings.displayName')}
+        placeholder={t('settings.displayNamePlaceholder')}
         value={displayName}
         onChangeText={setDisplayName}
       />
       <View style={styles.saveRow}>
         <Button
-          title="Save"
+          title={t('settings.save')}
           variant="secondary"
           loading={updateProfile.isPending}
           onPress={() => updateProfile.mutate(displayName)}
         />
         {updateProfile.isSuccess && !updateProfile.isPending ? (
           <AppText variant="small" style={{ color: colors.accent }}>
-            Saved
+            {t('settings.saved')}
           </AppText>
         ) : null}
         {updateProfile.error ? (

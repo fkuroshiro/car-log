@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
@@ -23,6 +24,7 @@ export function CarForm({
   error,
   onSubmit,
 }: CarFormProps) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [name, setName] = useState(initial?.name ?? '');
   const [make, setMake] = useState(initial?.make ?? '');
@@ -42,18 +44,18 @@ export function CarForm({
     const errors: typeof fieldErrors = {};
 
     if (!name.trim()) {
-      errors.name = 'Give the car a name.';
+      errors.name = t('carForm.errorName');
     }
     const yearNumber = year.trim() ? Number(year.trim()) : null;
     if (
       yearNumber !== null &&
       (!Number.isInteger(yearNumber) || yearNumber < 1900 || yearNumber > 2100)
     ) {
-      errors.year = 'Enter a year like 2014.';
+      errors.year = t('carForm.errorYear');
     }
     const odometerNumber = odometer.trim() ? Number(odometer.trim()) : 0;
     if (!Number.isInteger(odometerNumber) || odometerNumber < 0) {
-      errors.odometer = 'Enter kilometres as a whole number.';
+      errors.odometer = t('carForm.errorOdometer');
     }
 
     setFieldErrors(errors);
@@ -74,23 +76,23 @@ export function CarForm({
   return (
     <View style={styles.form}>
       <TextField
-        label="Name *"
-        placeholder="e.g. Daily driver"
+        label={t('carForm.name')}
+        placeholder={t('carForm.namePlaceholder')}
         value={name}
         onChangeText={setName}
         error={fieldErrors.name}
       />
       <View style={styles.row}>
         <TextField
-          label="Make"
-          placeholder="Škoda"
+          label={t('carForm.make')}
+          placeholder={t('carForm.makePlaceholder')}
           value={make}
           onChangeText={setMake}
           containerStyle={styles.flex}
         />
         <TextField
-          label="Model"
-          placeholder="Octavia"
+          label={t('carForm.model')}
+          placeholder={t('carForm.modelPlaceholder')}
           value={model}
           onChangeText={setModel}
           containerStyle={styles.flex}
@@ -98,7 +100,7 @@ export function CarForm({
       </View>
       <View style={styles.row}>
         <TextField
-          label="Year"
+          label={t('carForm.year')}
           placeholder="2014"
           keyboardType="numeric"
           value={year}
@@ -107,7 +109,7 @@ export function CarForm({
           containerStyle={styles.flex}
         />
         <TextField
-          label="Odometer (km)"
+          label={t('carForm.odometer')}
           placeholder="132500"
           keyboardType="numeric"
           value={odometer}
@@ -117,8 +119,8 @@ export function CarForm({
         />
       </View>
       <TextField
-        label="Registration plate"
-        placeholder="1AB 2345"
+        label={t('carForm.plate')}
+        placeholder={t('carForm.platePlaceholder')}
         autoCapitalize="characters"
         value={plate}
         onChangeText={setPlate}
