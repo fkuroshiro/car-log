@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
 import { Button } from '@/components/ui/button';
+import { DateField } from '@/components/ui/date-field';
 import { TextField } from '@/components/ui/text-field';
 import { todayISO } from '@/lib/format';
 import type {
@@ -135,14 +136,14 @@ export function ServiceRecordForm({
         error={fieldErrors.title}
       />
       <View style={styles.row}>
-        <TextField
-          label="Date *"
-          placeholder="2026-03-12"
-          value={servicedOn}
-          onChangeText={setServicedOn}
-          error={fieldErrors.servicedOn}
-          containerStyle={styles.flex}
-        />
+        <View style={styles.flex}>
+          <DateField
+            label="Date *"
+            value={servicedOn}
+            onChangeText={setServicedOn}
+            error={fieldErrors.servicedOn}
+          />
+        </View>
         <TextField
           label="Odometer (km) *"
           placeholder="132500"
