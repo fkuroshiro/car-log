@@ -1,0 +1,21 @@
+# Production image: build the static export, serve it with nginx.
+
+FROM node:24-bookworm-slim AS build
+WORKDIR /app
+
+# EXPO_PUBLIC_* values are baked into the bundle at export time; compose
+# passes them in from .env as build args.
+ARG EXPO_PUBLIC_SUPABASE_URL
+ARG EXPO_PUBLIC_SUPABASE_ANON_KEY
+ENV EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL \
+    EXPO_PUBLIC_SUPABASE_ANON_KEY=$EXPO_PUBLIC_SUPABASE_ANON_KEY \
+    EXPO_NO_TELEMETRY=1
+
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npx expo export --platform web
+
+FROM nginx:stable-alpine
+COPY deploy/web.nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html

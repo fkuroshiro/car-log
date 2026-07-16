@@ -1,0 +1,30 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createClient } from '@supabase/supabase-js';
+import { Platform } from 'react-native';
+
+import type { Database } from './database.types';
+
+// EXPO_PUBLIC_* variables are inlined into the app bundle at build time from
+// .env — they are visible to anyone using the app, which is fine: the anon
+// key is designed to be public, and Row Level Security guards the data.
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase config: copy .env.example to .env and fill in EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY.'
+  );
+}
+
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // Native needs AsyncStorage for session persistence. On web, supabase's
+    // default adapter must be used instead: it guards against `window` not
+    // existing, which is the case while Expo statically pre-renders pages
+    // in Node — AsyncStorage's web shim would crash there.
+    ...(Platform.OS === 'web' ? {} : { storage: AsyncStorage }),
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});

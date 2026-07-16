@@ -7,17 +7,18 @@ A minimal app for keeping track of your cars and their maintenance history. Add 
 ## Features (planned)
 
 - [x] Project scaffold (Expo + TypeScript + Expo Router)
-- [ ] Light / dark theme (off-white & dark-grey palettes, warm amber accent)
-- [ ] Accounts (Supabase Auth)
-- [ ] Garage: add, edit and remove cars
-- [ ] Service log: maintenance records with date, odometer (km), category, notes and cost
-- [ ] Per-car maintenance timeline
-- [ ] Web deployment
+- [x] Light / dark theme (off-white & dark-grey palettes, warm amber accent)
+- [x] English & Czech localization — follows the device language, manual override in settings
+- [x] Accounts (Supabase Auth)
+- [x] Garage: add, edit and remove cars
+- [x] Service log: maintenance records with date, odometer (km), category, notes and cost
+- [x] Per-car maintenance timeline
+- [x] Web deployment — live at [fkuroshiro.xyz/car-log](https://fkuroshiro.xyz/car-log/)
 - [ ] Native iOS / Android builds
 
 ### Someday
 
-Service reminders by km or date interval, fuel log, photo attachments, CSV export.
+Service reminders by km or date interval, fuel log, photo attachments, CSV export, currency setting for costs.
 
 ## Tech stack
 
@@ -32,12 +33,34 @@ The app is developed **web-first** from a single codebase; the same code will la
 
 ## Getting started
 
+With Docker (recommended — this is how the project is run in development):
+
+```bash
+docker compose up -d --build
+```
+
+The dev server listens on port `8081`. The source directory is bind-mounted
+into the container, so edits reload live without rebuilding the image.
+
+### Production
+
+The `web` compose service builds the static export (`expo export`) and
+serves it from a small nginx container on the shared reverse-proxy network;
+the host proxy publishes it at `https://fkuroshiro.xyz/car-log/` through a
+Cloudflare Tunnel. Deploying a new version is one command:
+
+```bash
+docker compose up -d --build web
+```
+
+Or directly with Node:
+
 ```bash
 npm install
 npm run web        # start the dev server for web
 ```
 
-Backend configuration (Supabase URL and anon key) goes in a local `.env` file — see `.env.example` once it exists. `.env` is never committed.
+Backend configuration lives in a local `.env` file — copy `.env.example` and fill it in. `.env` is never committed.
 
 ## Project structure
 

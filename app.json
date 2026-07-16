@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "car-log",
+    "name": "Car Log",
     "slug": "car-log",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -32,11 +32,13 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": true,
+      "baseUrl": "/car-log"
     }
   }
 }
