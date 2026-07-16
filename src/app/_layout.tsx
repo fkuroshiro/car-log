@@ -5,6 +5,7 @@ import {
   Stack,
   ThemeProvider as NavThemeProvider,
 } from 'expo-router';
+import Head from 'expo-router/head';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 
@@ -20,6 +21,14 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   return (
     <ThemeProvider>
+      {/* Outside the session gate so the static export renders it too. */}
+      <Head>
+        <title>Car Log</title>
+        <meta
+          name="description"
+          content="Track your cars and their maintenance history."
+        />
+      </Head>
       <QueryClientProvider client={queryClient}>
         <SessionProvider>
           <RootNavigator />
