@@ -12,7 +12,7 @@ A minimal app for keeping track of your cars and their maintenance history. Add 
 - [x] Garage: add, edit and remove cars
 - [x] Service log: maintenance records with date, odometer (km), category, notes and cost
 - [x] Per-car maintenance timeline
-- [ ] Web deployment
+- [x] Web deployment — live at [fkuroshiro.xyz/car-log](https://fkuroshiro.xyz/car-log/)
 - [ ] Native iOS / Android builds
 
 ### Someday
@@ -40,6 +40,17 @@ docker compose up -d --build
 
 The dev server listens on port `8081`. The source directory is bind-mounted
 into the container, so edits reload live without rebuilding the image.
+
+### Production
+
+The `web` compose service builds the static export (`expo export`) and
+serves it from a small nginx container on the shared reverse-proxy network;
+the host proxy publishes it at `https://fkuroshiro.xyz/car-log/` through a
+Cloudflare Tunnel. Deploying a new version is one command:
+
+```bash
+docker compose up -d --build web
+```
 
 Or directly with Node:
 
