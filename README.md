@@ -48,7 +48,7 @@ npm install
 npm run web        # start the dev server for web
 ```
 
-Backend configuration (Supabase URL and anon key) goes in a local `.env` file — see `.env.example` once it exists. `.env` is never committed.
+Backend configuration lives in a local `.env` file — copy `.env.example` and fill it in. `.env` is never committed.
 
 ## Project structure
 
